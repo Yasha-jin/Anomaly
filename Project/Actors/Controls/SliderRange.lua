@@ -11,6 +11,7 @@ local FunctionTable = {}
 
 -- Variables
 local Actors = {
+    Slider = nil,
     LeftMarker = nil,
     RightMarker = nil,
     BG = nil,
@@ -31,7 +32,7 @@ FunctionTable.UpdateSlider = function(Action)
         UpdateOrder[i]:playcommand("Update")
     end
     if Callback ~= nil then
-        Callback({Min = LeftIndex, Max = RightIndex, Action = Action})
+        Callback(Actors.Slider, {Min = LeftIndex, Max = RightIndex, Action = Action})
     end
 end
 
@@ -46,6 +47,9 @@ end
 
 return Def.ActorFrame {
     Name = "Slider",
+    InitCommand = function(self)
+        Actors.Slider = self
+    end,
     Def.Sprite {
         Name = "BG",
         Texture = Textures.BG,

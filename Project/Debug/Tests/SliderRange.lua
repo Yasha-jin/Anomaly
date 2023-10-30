@@ -1,5 +1,4 @@
 local t = Def.ActorFrame {}
-local FunctionTable = {}
 
 local textures = {
     Marker = PathManager.DebugSliderMarker,
@@ -7,14 +6,13 @@ local textures = {
     Fill = PathManager.DebugSliderRange
 }
 
-FunctionTable.Test = function(params)
-    Trace(params.Action)
-end
-
 t[#t + 1] = LoadActorWithParams(PathManager.Slider, {
         Textures = textures,
         MarkerOffset = 20,
-        Callback = FunctionTable.Test,
+        Callback = function(self, params)
+            Trace(self:GetX())
+            Trace(params.Action)
+        end,
         MaxRange = 10}) .. {
     BeginCommand = function(self)
         self:x(1920.0 / 2)
