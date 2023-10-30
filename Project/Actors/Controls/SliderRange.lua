@@ -26,13 +26,13 @@ local MaxX = 0
 local LeftIndex = InitMinRange
 local RightIndex = InitMaxRange
 
-FunctionTable.UpdateSlider = function(Action)
-    Action = Action or ""
+FunctionTable.UpdateSlider = function(event)
+    event = event or ""
     for i = 1, #UpdateOrder do
         UpdateOrder[i]:playcommand("Update")
     end
     if Callback ~= nil then
-        Callback(Actors.Slider, {Min = LeftIndex, Max = RightIndex, Action = Action})
+        Callback(Actors.Slider, {min = LeftIndex, max = RightIndex, event = event})
     end
 end
 

@@ -11,7 +11,7 @@ t[#t + 1] = LoadActorWithParams(PathManager.Slider, {
         MarkerOffset = 20,
         Callback = function(self, params)
             Trace(self:GetX())
-            Trace(params.Action)
+            Trace(params.event)
         end,
         MaxRange = 10}) .. {
     BeginCommand = function(self)
