@@ -101,6 +101,10 @@ return Def.ActorFrame {
             LeftIndex = clamp(FunctionTable.GetIndex(self, params), MinRange, RightIndex - 1)
             FunctionTable.UpdateSlider("Drag")
         end,
+        MouseClickCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            FunctionTable.UpdateSlider("Release")
+        end,
         MouseReleaseCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
             FunctionTable.UpdateSlider("Release")
@@ -125,6 +129,10 @@ return Def.ActorFrame {
             if params.event ~= "DeviceButton_left mouse button" then return end
             RightIndex = clamp(FunctionTable.GetIndex(self, params), LeftIndex + 1, MaxRange)
             FunctionTable.UpdateSlider("Drag")
+        end,
+        MouseClickCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            FunctionTable.UpdateSlider("Release")
         end,
         MouseReleaseCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
