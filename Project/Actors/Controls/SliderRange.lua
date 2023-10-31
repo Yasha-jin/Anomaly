@@ -26,6 +26,7 @@ local MinX = 0
 local MaxX = 0
 local LeftIndex = InitMinRange
 local RightIndex = InitMaxRange
+local GrabedMarker = nil
 
 FunctionTable.UpdateSlider = function(event)
     event = event or ""
@@ -60,9 +61,8 @@ return Def.ActorFrame {
         RightIndex = InitMaxRange
         FunctionTable.UpdateSlider("Reset")
     end,
-    Def.Sprite {
+    UIElements.SpriteButton(1, 1, Textures.BG) .. {
         Name = "BG",
-        Texture = Textures.BG,
         InitCommand = function(self)
             Actors.BG = self
             UpdateOrder[1] = self
@@ -70,11 +70,38 @@ return Def.ActorFrame {
         end,
         BeginCommand = function(self)
             FunctionTable.UpdateSlider()
-        end
+        end,
+        MouseDownCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            if RightIndex - FunctionTable.GetIndex(self, params) < FunctionTable.GetIndex(self, params) - LeftIndex then
+                GrabedMarker = Actors.RightMarker
+            else
+                GrabedMarker = Actors.LeftMarker
+            end
+            FunctionTable.UpdateSlider("Press")
+        end,
+        MouseHoldCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            if GrabedMarker == Actors.RightMarker then
+                RightIndex = clamp(FunctionTable.GetIndex(self, params), LeftIndex + 1, MaxRange)
+            else
+                LeftIndex = clamp(FunctionTable.GetIndex(self, params), MinRange, RightIndex - 1)
+            end
+            FunctionTable.UpdateSlider("Drag")
+        end,
+        MouseClickCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            GrabedMarker = nil
+            FunctionTable.UpdateSlider("Release")
+        end,
+        MouseReleaseCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            GrabedMarker = nil
+            FunctionTable.UpdateSlider("Release")
+        end,
     },
-    Def.Sprite {
+    UIElements.SpriteButton(1, 1, Textures.Fill) .. {
         Name = "Fill",
-        Texture = Textures.Fill,
         InitCommand = function(self)
             Actors.Fill = self
             UpdateOrder[4] = self
@@ -88,7 +115,35 @@ return Def.ActorFrame {
                 self:cropleft(LeftIndex / MaxRange)
                 self:cropright(1 - (RightIndex / MaxRange))
             end
-        end
+        end,
+        MouseDownCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            if RightIndex - FunctionTable.GetIndex(self, params) < FunctionTable.GetIndex(self, params) - LeftIndex then
+                GrabedMarker = Actors.RightMarker
+            else
+                GrabedMarker = Actors.LeftMarker
+            end
+            FunctionTable.UpdateSlider("Press")
+        end,
+        MouseHoldCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            if GrabedMarker == Actors.RightMarker then
+                RightIndex = clamp(FunctionTable.GetIndex(self, params), LeftIndex + 1, MaxRange)
+            else
+                LeftIndex = clamp(FunctionTable.GetIndex(self, params), MinRange, RightIndex - 1)
+            end
+            FunctionTable.UpdateSlider("Drag")
+        end,
+        MouseClickCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            GrabedMarker = nil
+            FunctionTable.UpdateSlider("Release")
+        end,
+        MouseReleaseCommand = function(self, params)
+            if params.event ~= "DeviceButton_left mouse button" then return end
+            GrabedMarker = nil
+            FunctionTable.UpdateSlider("Release")
+        end,
     },
     UIElements.SpriteButton(1, 1, Textures.Marker) .. {
         Name = "LeftMarker",
