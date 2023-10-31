@@ -10,8 +10,9 @@ t[#t + 1] = LoadActorWithParams(PathManager.Slider, {
         Textures = textures,
         MarkerOffset = 20,
         Callback = function(self, params)
-            Trace(self:GetX())
-            Trace(params.event)
+            if params.event == "Release" then
+                Trace(params.min)
+            end
         end,
         MaxRange = 10}) .. {
     BeginCommand = function(self)

@@ -7,6 +7,7 @@ local MaxRange = Var("MaxRange") or 10
 local InitMinRange = Var("InitMinRange") or MinRange
 local InitMaxRange = Var("InitMaxRange") or MaxRange
 local MarkerOffset = Var("MarkerOffset") or 0
+local ResetSpeed = Var("ResetSpeed") or 0.5
 local FunctionTable = {}
 
 -- Variables
@@ -29,7 +30,11 @@ local RightIndex = InitMaxRange
 FunctionTable.UpdateSlider = function(event)
     event = event or ""
     for i = 1, #UpdateOrder do
-        UpdateOrder[i]:playcommand("Update")
+        if event == "Reset" then
+            UpdateOrder[i]:stoptweening():decelerate(ResetSpeed):playcommand("Update")
+        else
+            UpdateOrder[i]:stoptweening():playcommand("Update")
+        end
     end
     if Callback ~= nil then
         Callback(Actors.Slider, {min = LeftIndex, max = RightIndex, event = event})
@@ -49,6 +54,11 @@ return Def.ActorFrame {
     Name = "Slider",
     InitCommand = function(self)
         Actors.Slider = self
+    end,
+    ResetCommand = function(self)
+        LeftIndex = InitMinRange
+        RightIndex = InitMaxRange
+        FunctionTable.UpdateSlider("Reset")
     end,
     Def.Sprite {
         Name = "BG",
