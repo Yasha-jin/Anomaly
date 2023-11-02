@@ -2,8 +2,7 @@ local t = Def.ActorFrame {
     BeginCommand = function(self)
         InputManager.CreateInput("escape",
             InputManager.Press,
-            ScreenManager,
-            "NewScreen",
+            ScreenManager.NewScreen,
             ScreenManager.Debug)
     end
 }

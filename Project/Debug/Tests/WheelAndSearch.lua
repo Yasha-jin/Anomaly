@@ -1,10 +1,9 @@
 local t = Def.ActorFrame {}
 
-local FunctionTable = {}
-FunctionTable.ReduceSound = function()
+ReduceSound = function()
     SOUND:SetVolume(0.1)
 end
-FunctionTable.BoostSound = function()
+BoostSound = function()
     SOUND:SetVolume(1)
 end
 
@@ -15,8 +14,8 @@ t[#t + 1] = Def.Sprite {
         self:zoomto(1920,1080)
     end,
     BeginCommand = function(self)
-        InputManager.CreateInput("F7", InputManager.Press, FunctionTable, "ReduceSound")
-        InputManager.CreateInput("F8", InputManager.Press, FunctionTable, "BoostSound")
+        InputManager.CreateInput("F7", InputManager.Press, ReduceSound)
+        InputManager.CreateInput("F8", InputManager.Press, BoostSound)
     end
 }
 

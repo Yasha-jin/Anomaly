@@ -19,62 +19,53 @@ t[#t + 1] = Def.ActorFrame {
     },
 }
 
-local FunctionTable = {}
-FunctionTable.InputTest = function() ms.ok("The F key as been pressed.") end
-FunctionTable.SingularArgTest = function(arg1) ms.ok(arg1) end
-FunctionTable.MultiArgsTest = function(arg1, arg2, arg3) ms.ok(arg1 .. arg2 .. arg3) end
+InputTest = function() ms.ok("The F key as been pressed.") end
+SingularArgTest = function(arg1) ms.ok(arg1) end
+MultiArgsTest = function(arg1, arg2, arg3) ms.ok(arg1 .. arg2 .. arg3) end
 
 t[#t + 1] = Def.ActorFrame {
     -- Adding input during Init don't work, as the screen is still loading, so do it in Begin instead.
     BeginCommand = function(self)
-        InputManager.CreateInput("f", InputManager.Press, FunctionTable, "InputTest")
+        InputManager.CreateInput("f", InputManager.Press, InputTest)
 
         InputManager.CreateInput("g",
             InputManager.Press,
-            FunctionTable,
-            "SingularArgTest",
+            SingularArgTest,
             "The G key as been pressed.")
         
         InputManager.CreateInput("h",
             InputManager.Press,
-            FunctionTable,
-            "MultiArgsTest",
+            MultiArgsTest,
             {"The H key ", "as been ", "pressed."})
         
         InputManager.CreateInput("j",
             InputManager.Press,
-            self, -- self is a table yes.
-            "queuecommand",
+            self.queuecommand,
             {self, "CommandTest"}) -- self methods use ":" which automatically pass self,
-            -- but here you need to pass it for the method to work.
+            -- but using . here mean you need to pass it for the method to work.
         
         InputManager.CreateInput("k",
             InputManager.Press,
-            self,
-            "playcommand",
+            self.playcommand,
             {self, "CommandTestWithArg", {"The K key as been pressed."}})
         
         InputManager.CreateInput("l",
             InputManager.Press,
-            self,
-            "playcommand",
+            self.playcommand,
             {self, "CommandTestWithMultiArgs", {"The L key ", "as been ", "pressed."}})
         
         InputManager.CreateInput("c",
             InputManager.Press,
-            SCREENMAN,
-            "SetNewScreen",
+            SCREENMAN.SetNewScreen,
             {SCREENMAN, "ScreenOptionsService"})
         
         InputManager.CreateInput("v",
             InputManager.Press,
-            _G, -- _G is the global table, use this when using a global function that is not inside a table.
-            "DebugInputTest")
+            DebugInputTest)
         
         InputManager.CreateInput("b",
             InputManager.Press,
-            _G,
-            "DebugInputTest",
+            DebugInputTest,
             {"The B key as been pressed."})
     end,
     CommandTestCommand = function(self)

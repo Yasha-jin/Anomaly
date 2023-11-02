@@ -8,28 +8,27 @@ local selected_btn_x = SCREEN_WIDTH
 local pack_btn_x = SCREEN_WIDTH + 60
 local song_btn_x = SCREEN_WIDTH + 100
 local wheel_middle_index = 5
-local FunctionTable = {}
 
-FunctionTable.IncreaseWheelIndex = function()
+IncreaseWheelIndex = function()
     if current_opened_pack_index == 0 then
         current_wheel_index = Math.wrap(current_wheel_index, #Packs) + 1
     else
         current_wheel_index = Math.wrap(current_wheel_index, #Packs + #Packs[current_opened_pack_index]["Songs"]) + 1
     end
     
-    FunctionTable.UpdateWheel()
+    UpdateWheel()
 end
 
-FunctionTable.DecreaseWheelIndex = function()
+DecreaseWheelIndex = function()
     if current_opened_pack_index == 0 then
         current_wheel_index = Math.wrap(current_wheel_index - 2, #Packs) + 1
     else
         current_wheel_index = Math.wrap(current_wheel_index - 2, #Packs + #Packs[current_opened_pack_index]["Songs"]) + 1
     end
-    FunctionTable.UpdateWheel()
+    UpdateWheel()
 end
 
-FunctionTable.SendMouseInputCommand = function()
+SendMouseInputCommand = function()
     WheelActors[wheel_middle_index]:queuecommand("MouseInput")
 end
 
@@ -64,17 +63,17 @@ end
 local t = Def.ActorFrame {
     BeginCommand = function(self)
         -- wheel input
-        InputManager.CreateInput("mousewheel down", InputManager.Press, FunctionTable, "IncreaseWheelIndex")
-        InputManager.CreateInput("mousewheel up", InputManager.Press, FunctionTable, "DecreaseWheelIndex")
+        InputManager.CreateInput("mousewheel down", InputManager.Press, IncreaseWheelIndex)
+        InputManager.CreateInput("mousewheel up", InputManager.Press, DecreaseWheelIndex)
         
         -- keyboard input
-        InputManager.CreateInput("right", InputManager.Press, FunctionTable, "IncreaseWheelIndex")
-        InputManager.CreateInput("right", InputManager.Repeat, FunctionTable, "IncreaseWheelIndex")
-        InputManager.CreateInput("left", InputManager.Press, FunctionTable, "DecreaseWheelIndex")
-        InputManager.CreateInput("left", InputManager.Repeat, FunctionTable, "DecreaseWheelIndex")
-        InputManager.CreateInput("space", InputManager.Press, FunctionTable, "SendMouseInputCommand")
+        InputManager.CreateInput("right", InputManager.Press, IncreaseWheelIndex)
+        InputManager.CreateInput("right", InputManager.Repeat, IncreaseWheelIndex)
+        InputManager.CreateInput("left", InputManager.Press, DecreaseWheelIndex)
+        InputManager.CreateInput("left", InputManager.Repeat, DecreaseWheelIndex)
+        InputManager.CreateInput("space", InputManager.Press, SendMouseInputCommand)
 
-        FunctionTable.UpdateWheel()
+        UpdateWheel()
     end
 }
 
@@ -136,7 +135,7 @@ for i = 1, button_amount do
                 end
             end
 
-            FunctionTable.UpdateWheel()
+            UpdateWheel()
         end,
         MouseOverCommand = function(self)
             
@@ -147,7 +146,7 @@ for i = 1, button_amount do
     }
 end
 
-FunctionTable.UpdateWheel = function()
+UpdateWheel = function()
     local wheel_information = {}
 
     if current_opened_pack_index ~= 0 then
@@ -194,7 +193,7 @@ FunctionTable.UpdateWheel = function()
             btn:x(song_btn_x)
             if i == wheel_middle_index then
                 btn:x(pack_btn_x)
-                FunctionTable.UpdateScreen()
+                UpdateScreen()
             end
             btn:GetChild("Pack"):visible(false)
             btn:GetChild("SongTitle"):visible(true)
@@ -203,7 +202,7 @@ FunctionTable.UpdateWheel = function()
     end
 end
 
-FunctionTable.UpdateScreen = function()
+UpdateScreen = function()
     -- Trace("Selected Pack : " .. Packs[current_opened_pack_index]["Name"])
     -- Trace("Selected Song : " .. Packs[current_opened_pack_index]["Songs"][current_wheel_index - current_opened_pack_index]["Name"])
 

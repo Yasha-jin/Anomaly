@@ -60,7 +60,7 @@ t[#t + 1] = LoadActorWithParams(PathManager.MultiSprite, {
         self:x(1920.0 / 2)
         self:y(1080.0 / 2)
         self:queuecommand("OneShot")
-        InputManager.CreateInput("t", InputManager.Press, self, "queuecommand", {self, "OneShot"})
+        InputManager.CreateInput("t", InputManager.Press, self.queuecommand, {self, "OneShot"})
     end
 }
 

@@ -2,14 +2,12 @@ local t = Def.ActorFrame {
     BeginCommand = function(self)
         InputManager.CreateInput("F1",
             InputManager.Press,
-            SCREENMAN,
-            "SetNewScreen",
+            SCREENMAN.SetNewScreen,
             {SCREENMAN, "ScreenOptionsService"})
         
         InputManager.CreateInput("F4",
             InputManager.Press,
-            SCREENMAN,
-            "SetNewScreen",
+            SCREENMAN.SetNewScreen,
             {SCREENMAN, "ScreenSelectMusic"})
         
         -- GAMESTATE:SetCurrentStyle("single")

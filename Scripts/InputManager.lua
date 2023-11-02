@@ -21,7 +21,7 @@ DebugInputTest = function(arg)
     end
 end
 
-InputManager.CreateInput = function(Button, Type, FunctionTable, FunctionName, args)
+InputManager.CreateInput = function(Button, Type, Callback, args)
     local args = args or {}
     if type(args) ~= "table" then
         args = {args}
@@ -30,7 +30,7 @@ InputManager.CreateInput = function(Button, Type, FunctionTable, FunctionName, a
         -- ms.ok(event["DeviceInput"])
         if event.type == Type then
 			if event.DeviceInput.button == "DeviceButton_" .. Button then
-                FunctionTable[FunctionName](unpack(args))
+                Callback(unpack(args))
             end
 		end
 	end)
