@@ -61,6 +61,11 @@ return Def.ActorFrame {
         RightIndex = InitMaxRange
         FunctionTable.UpdateSlider("Reset")
     end,
+    SetIndexCommand = function(self, params)
+        LeftIndex = params.left
+        RightIndex = params.right
+        FunctionTable.UpdateSlider()
+    end,
     UIElements.SpriteButton(1, 1, Textures.BG) .. {
         Name = "BG",
         InitCommand = function(self)
