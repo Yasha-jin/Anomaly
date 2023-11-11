@@ -21,6 +21,7 @@ local Tests = {
     "WheelAndSearch",
     "TextInputField",
     "Perspective",
+    "Slider",
     "SliderRange"
 }
 

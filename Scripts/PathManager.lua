@@ -24,7 +24,8 @@ PathManager.ActorWheelPath = PathManager.ActorPath .. PathManager.ActorType.Whee
 
 PathManager.Button = PathManager.ActorControlPath .. "Button.lua"
 PathManager.MultiSprite = PathManager.ActorControlPath .. "MultiSprite.lua"
-PathManager.Slider = PathManager.ActorControlPath .. "SliderRange.lua"
+PathManager.Slider = PathManager.ActorControlPath .. "Slider.lua"
+PathManager.SliderRange = PathManager.ActorControlPath .. "SliderRange.lua"
 PathManager.EtternaWheel = PathManager.ActorWheelPath .. "EtternaWheel.lua"
 
 PathManager.GetActor = function(ActorType, ActorName)

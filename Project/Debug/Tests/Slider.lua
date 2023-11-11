@@ -6,15 +6,16 @@ local textures = {
     Fill = PathManager.DebugSliderRange
 }
 
-t[#t + 1] = LoadActorWithParams(PathManager.SliderRange, {
+t[#t + 1] = LoadActorWithParams(PathManager.Slider, {
         Textures = textures,
         MarkerOffset = 20,
         Callback = function(self, params)
             if params.event == "Release" then
-                Trace("Min : " .. tostring(params.min) .. " | Max : " .. tostring(params.max))
+                Trace("Value : " .. tostring(params.value))
             end
         end,
-        MaxRange = 10}) .. {
+        MaxRange = 10,
+        InitRange = 5}) .. {
     BeginCommand = function(self)
         self:x(1920.0 / 2)
         self:y(1080.0 / 2)

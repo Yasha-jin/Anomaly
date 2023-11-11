@@ -4,16 +4,14 @@ local Stretch = Var("Stretch") or false
 local Callback = Var("Callback") or nil -- assign a function to this
 local MinRange = Var("MinRange") or 0
 local MaxRange = Var("MaxRange") or 10
-local InitMinRange = Var("InitMinRange") or MinRange
-local InitMaxRange = Var("InitMaxRange") or MaxRange
+local InitRange = Var("InitRange") or MinRange
 local MarkerOffset = Var("MarkerOffset") or 0
 local ResetSpeed = Var("ResetSpeed") or 0.5
 
 -- Variables
 local Actors = {
     Slider = nil,
-    LeftMarker = nil,
-    RightMarker = nil,
+    Marker = nil,
     BG = nil,
     Fill = nil
 }
@@ -23,9 +21,7 @@ local BGTex = nil
 local RangeTex = nil
 local MinX = 0
 local MaxX = 0
-local LeftIndex = InitMinRange
-local RightIndex = InitMaxRange
-local GrabedMarker = nil
+local Index = InitRange
 
 UpdateSlider = function(event)
     event = event or ""
@@ -37,7 +33,7 @@ UpdateSlider = function(event)
         end
     end
     if Callback ~= nil then
-        Callback(Actors.Slider, {min = LeftIndex, max = RightIndex, event = event})
+        Callback(Actors.Slider, {value = Index, event = event})
     end
 end
 
@@ -56,13 +52,11 @@ return Def.ActorFrame {
         Actors.Slider = self
     end,
     ResetCommand = function(self)
-        LeftIndex = InitMinRange
-        RightIndex = InitMaxRange
+        Index = InitRange
         UpdateSlider("Reset")
     end,
     SetIndexCommand = function(self, params)
-        LeftIndex = params.left
-        RightIndex = params.right
+        Index = params.value
         UpdateSlider("Set")
     end,
     UIElements.SpriteButton(1, 1, Textures.BG) .. {
@@ -77,30 +71,19 @@ return Def.ActorFrame {
         end,
         MouseDownCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            if RightIndex - GetIndex(self, params) < GetIndex(self, params) - LeftIndex then
-                GrabedMarker = Actors.RightMarker
-            else
-                GrabedMarker = Actors.LeftMarker
-            end
             UpdateSlider("Press")
         end,
         MouseHoldCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            if GrabedMarker == Actors.RightMarker then
-                RightIndex = clamp(GetIndex(self, params), LeftIndex + 1, MaxRange)
-            else
-                LeftIndex = clamp(GetIndex(self, params), MinRange, RightIndex - 1)
-            end
+            Index = clamp(GetIndex(self, params), MinRange, MaxRange)
             UpdateSlider("Drag")
         end,
         MouseClickCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            GrabedMarker = nil
             UpdateSlider("Release")
         end,
         MouseReleaseCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            GrabedMarker = nil
             UpdateSlider("Release")
         end,
     },
@@ -108,58 +91,51 @@ return Def.ActorFrame {
         Name = "Fill",
         InitCommand = function(self)
             Actors.Fill = self
-            UpdateOrder[4] = self
+            UpdateOrder[3] = self
             RangeTex = self:GetTexture()
+            if Stretch then
+                self:addx(-(BGTex:GetImageWidth() / 2))
+                self:halign(0)
+                self:addx(MarkerOffset / 2)
+            end
         end,
         UpdateCommand = function(self)
             if Stretch then
-                self:x(Actors.LeftMarker:GetX() + ((Actors.RightMarker:GetX() - Actors.LeftMarker:GetX()) / 2))
-                self:zoomx((Actors.RightMarker:GetX() - Actors.LeftMarker:GetX()) / RangeTex:GetImageWidth())
+                self:zoomx((Actors.Marker:GetX() - self:GetX()) / RangeTex:GetImageWidth())
             else
-                self:cropleft(LeftIndex / MaxRange)
-                self:cropright(1 - (RightIndex / MaxRange))
+                self:cropright(1 - (Index / MaxRange))
             end
         end,
         MouseDownCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            if RightIndex - GetIndex(self, params) < GetIndex(self, params) - LeftIndex then
-                GrabedMarker = Actors.RightMarker
-            else
-                GrabedMarker = Actors.LeftMarker
-            end
             UpdateSlider("Press")
         end,
         MouseHoldCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            if GrabedMarker == Actors.RightMarker then
-                RightIndex = clamp(GetIndex(self, params), LeftIndex + 1, MaxRange)
-            else
-                LeftIndex = clamp(GetIndex(self, params), MinRange, RightIndex - 1)
-            end
+            Index = clamp(GetIndex(self, params), MinRange, MaxRange)
             UpdateSlider("Drag")
         end,
         MouseClickCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            GrabedMarker = nil
             UpdateSlider("Release")
         end,
         MouseReleaseCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            GrabedMarker = nil
             UpdateSlider("Release")
         end,
     },
     UIElements.SpriteButton(1, 1, Textures.Marker) .. {
-        Name = "LeftMarker",
+        Name = "Marker",
         InitCommand = function(self)
-            Actors.LeftMarker = self
+            Actors.Marker = self
             UpdateOrder[2] = self
             MarkerTex = self:GetTexture()
+            MaxX = self:GetX() + (BGTex:GetImageWidth() / 2 - MarkerOffset)
             self:addx(-(BGTex:GetImageWidth() / 2) + MarkerOffset)
             MinX = self:GetX()
         end,
         UpdateCommand = function(self)
-            self:x(MinX + ((MaxX - MinX) / MaxRange * (LeftIndex - MinRange)))
+            self:x(MinX + ((MaxX - MinX) / MaxRange * (Index - MinRange)))
         end,
         MouseDownCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
@@ -167,7 +143,7 @@ return Def.ActorFrame {
         end,
         MouseHoldCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
-            LeftIndex = clamp(GetIndex(self, params), MinRange, RightIndex - 1)
+            Index = clamp(GetIndex(self, params), MinRange, MaxRange)
             UpdateSlider("Drag")
         end,
         MouseClickCommand = function(self, params)
@@ -178,34 +154,5 @@ return Def.ActorFrame {
             if params.event ~= "DeviceButton_left mouse button" then return end
             UpdateSlider("Release")
         end,
-    },
-    UIElements.SpriteButton(1, 1, Textures.Marker) .. {
-        Name = "RightMarker",
-        InitCommand = function(self)
-            Actors.RightMarker = self
-            UpdateOrder[3] = self
-            self:addx(BGTex:GetImageWidth() / 2 - MarkerOffset)
-            MaxX = self:GetX()
-        end,
-        UpdateCommand = function(self)
-            self:x(MinX + ((MaxX - MinX) / MaxRange * RightIndex))
-        end,
-        MouseDownCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
-            UpdateSlider("Press")
-        end,
-        MouseHoldCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
-            RightIndex = clamp(GetIndex(self, params), LeftIndex + 1, MaxRange)
-            UpdateSlider("Drag")
-        end,
-        MouseClickCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
-            UpdateSlider("Release")
-        end,
-        MouseReleaseCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
-            UpdateSlider("Release")
-        end,
-    },
+    }
 }
