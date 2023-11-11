@@ -51,6 +51,10 @@ PathManager.DebugButton = PathManager.DebugGraphic .. "menu-button-background.pn
 PathManager.DebugSliderMarker = PathManager.DebugGraphic .. "Slider/Marker.png"
 PathManager.DebugSliderBG = PathManager.DebugGraphic .. "Slider/BG.png"
 PathManager.DebugSliderRange = PathManager.DebugGraphic .. "Slider/Range.png"
+PathManager.DebugPause = PathManager.DebugGraphic .. "MusicPlayer/Pause.png"
+PathManager.DebugResume = PathManager.DebugGraphic .. "MusicPlayer/Resume.png"
+PathManager.DebugPrevious = PathManager.DebugGraphic .. "MusicPlayer/Previous.png"
+PathManager.DebugNext = PathManager.DebugGraphic .. "MusicPlayer/Next.png"
 
 PathManager.GetDebugAsset = function(DebugAssetType, DebugAssetName)
     return PathManager.DebugAssetPath .. DebugAssetType .. "/" .. DebugAssetName

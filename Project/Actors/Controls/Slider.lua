@@ -1,4 +1,3 @@
--- Constants
 local Textures = Var("Textures") or {Marker = nil, BG = nil, Fill = nil}
 local Stretch = Var("Stretch") or false
 local Callback = Var("Callback") or nil -- assign a function to this
@@ -8,7 +7,6 @@ local InitRange = Var("InitRange") or MinRange
 local MarkerOffset = Var("MarkerOffset") or 0
 local ResetSpeed = Var("ResetSpeed") or 0.5
 
--- Variables
 local Actors = {
     Slider = nil,
     Marker = nil,
@@ -57,6 +55,11 @@ return Def.ActorFrame {
     end,
     SetIndexCommand = function(self, params)
         Index = params.value
+        UpdateSlider("Set")
+    end,
+    SetRangeCommand = function(self, params)
+        MinRange = params.min
+        MaxRange = params.max
         UpdateSlider("Set")
     end,
     UIElements.SpriteButton(1, 1, Textures.BG) .. {

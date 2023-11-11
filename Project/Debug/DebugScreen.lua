@@ -7,7 +7,7 @@ local t = Def.ActorFrame {
     end
 }
 
-local MaxRowAmount = 8
+local MaxRowAmount = 7
 local ButtonHorizontalSize = 288
 local ButtonVerticalSize = 96
 local HorizontalSpacing = 32
@@ -22,7 +22,8 @@ local Tests = {
     "TextInputField",
     "Perspective",
     "Slider",
-    "SliderRange"
+    "SliderRange",
+    "MusicPlayer"
 }
 
 local SelectedTest = Var("SelectedTest") or nil
