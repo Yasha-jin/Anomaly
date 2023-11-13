@@ -39,10 +39,12 @@ PathManager.DebugAssetPath = PathManager.DebugPath .. "DebugAssets/"
 
 -- Aliases for DebugAssetType
 PathManager.DebugAssetType = {
-    Graphics = "Graphics"
+    Graphics = "Graphics",
+    Toasties = "Toasties"
 }
 
 PathManager.DebugGraphic = PathManager.DebugAssetPath .. PathManager.DebugAssetType.Graphics .. "/"
+PathManager.DebugToasties = PathManager.DebugAssetPath .. PathManager.DebugAssetType.Toasties .. "/"
 
 PathManager.DebugMultiSprite = PathManager.DebugGraphic .. "MultiSprite/"
 PathManager.DebugSpritesheet = PathManager.DebugGraphic .. "Spritesheet 7x28.png"
