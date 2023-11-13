@@ -41,33 +41,19 @@ UpdateWheel = function()
         ref.Menu:GetChild("Toasty" .. i):settext(toasty)
     end
     for i = 1, #ToastiesActors do
-        if ToastiesActors[i]:GetName() ~= Toasties[current_wheel_index] .. i then
-            ToastiesActors[i]:finishtweening()
-            ToastiesActors[i]:visible(false)
-        else
-            LastToasty = Toasties[current_wheel_index]
-            ToastiesActors[i]:finishtweening()
-            ToastiesActors[i]:visible(true)
-        end
-    end
-    SOUND:StopMusic()
-end
-
-ResetToasty = function(self, index)
-    DebugToasty = Toasties[index]
-    IsThemeToasty = true
-    if index > #DebugToasties then
-        IsThemeToasty = false
-    end
-    local child = self:GetChildren()
-    for _, k in pairs(child) do
-        for j, val in pairs(k) do
-            val:diffusealpha(0)
-            if j == 1 then
-                val:Load(getToastyAssetPath("image"))
-            elseif j == 2 then
-                val:load(getToastyAssetPath("sound"))
+        ToastiesActors[i]:finishtweening()
+        ToastiesActors[i]:visible(false)
+        for _, frame in pairs(ToastiesActors[i]:GetChildren()) do
+            for _, child in pairs(frame) do
+                -- only Def.Sound actor have a stop function, use that to found audio actor,
+                -- and stop the playing audio if any.
+                if child.stop ~= nil then
+                    child:stop()
+                end
             end
+        end
+        if ToastiesActors[i]:GetName() == Toasties[current_wheel_index] .. i then
+            LastToasty = Toasties[current_wheel_index]
         end
     end
 end
@@ -119,16 +105,26 @@ end
 t[#t + 1] = Menu
 
 for i = 1, #Toasties do
-    DebugToasty = Toasties[i]
+    Toasty = Toasties[i]
     local path = PathManager.DebugToasties
+    IsThemeToasty = true
     if i > #DebugToasties then
         IsThemeToasty = false
         path = "/Assets/Toasties/"
     end
     -- look for a custom lua file and if there is one load it instead
-    if FILEMAN:DoesFileExist(path .. DebugToasty .. "/default.lua") then
-        t[#t + 1] = LoadActor(path .. DebugToasty .. "/default") .. {
-            Name = DebugToasty .. i,
+    if FILEMAN:DoesFileExist(path .. Toasty .. "/default.lua") then
+        t[#t + 1] = Def.ActorFrame {
+            InitCommand = function(self)
+                Toasty = Toasties[i]
+                IsThemeToasty = true
+                if i > #DebugToasties then
+                    IsThemeToasty = false
+                end
+            end
+        }
+        t[#t + 1] = LoadActor(path .. Toasty .. "/default") .. {
+            Name = Toasty .. i,
             InitCommand = function(self)
                 ToastiesActors[#ToastiesActors + 1] = self
             end,
@@ -137,18 +133,34 @@ for i = 1, #Toasties do
                     InputManager.Press,
                     self.playcommand,
                     {self, "PreTransition"})
-                ResetToasty(self, i)
             end,
             PreTransitionCommand = function(self)
-                if self:GetVisible() then
+                if self:GetName() == LastToasty .. i then
                     self:finishtweening()
+                    self:visible(true)
+                    for _, frame in pairs(self:GetChildren()) do
+                        for _, child in pairs(frame) do
+                            if child.stop ~= nil then
+                                child:stop()
+                            end
+                        end
+                    end
                     self:playcommand("StartTransitioning")
                 end
             end
         }
     else
         t[#t + 1] = Def.ActorFrame {
-            Name = DebugToasty .. i,
+            InitCommand = function(self)
+                Toasty = Toasties[i]
+                IsThemeToasty = true
+                if i > #DebugToasties then
+                    IsThemeToasty = false
+                end
+            end
+        }
+        t[#t + 1] = Def.ActorFrame {
+            Name = Toasty .. i,
             InitCommand = function(self)
                 ToastiesActors[#ToastiesActors + 1] = self
             end,
@@ -157,11 +169,18 @@ for i = 1, #Toasties do
                     InputManager.Press,
                     self.playcommand,
                     {self, "PreTransition"})
-                ResetToasty(self, i)
             end,
             PreTransitionCommand = function(self)
-                if self:GetVisible() then
+                if self:GetName() == LastToasty .. i then
                     self:finishtweening()
+                    self:visible(true)
+                    for _, frame in pairs(self:GetChildren()) do
+                        for _, child in pairs(frame) do
+                            if child.stop ~= nil then
+                                child:stop()
+                            end
+                        end
+                    end
                     self:playcommand("StartTransitioning")
                 end
             end,
