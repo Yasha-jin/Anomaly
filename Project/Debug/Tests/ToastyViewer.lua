@@ -18,7 +18,7 @@ end
 
 local current_wheel_index = 1
 for i = 1, #Toasties do
-    if Toasties[i] == LastToasty then
+    if Toasties[i] == ToastyManager.LastToasty then
         current_wheel_index = i
     end
 end
@@ -53,7 +53,7 @@ UpdateWheel = function()
             end
         end
         if ToastiesActors[i]:GetName() == Toasties[current_wheel_index] .. i then
-            LastToasty = Toasties[current_wheel_index]
+            ToastyManager.LastToasty = Toasties[current_wheel_index]
         end
     end
 end
@@ -105,26 +105,26 @@ end
 t[#t + 1] = Menu
 
 for i = 1, #Toasties do
-    Toasty = Toasties[i]
+    ToastyManager.Toasty = Toasties[i]
     local path = PathManager.DebugToasties
-    IsThemeToasty = true
+    ToastyManager.IsThemeToasty = true
     if i > #DebugToasties then
-        IsThemeToasty = false
+        ToastyManager.IsThemeToasty = false
         path = "/Assets/Toasties/"
     end
     -- look for a custom lua file and if there is one load it instead
-    if FILEMAN:DoesFileExist(path .. Toasty .. "/default.lua") then
+    if FILEMAN:DoesFileExist(path .. ToastyManager.Toasty .. "/default.lua") then
         t[#t + 1] = Def.ActorFrame {
             InitCommand = function(self)
-                Toasty = Toasties[i]
-                IsThemeToasty = true
+                ToastyManager.Toasty = Toasties[i]
+                ToastyManager.IsThemeToasty = true
                 if i > #DebugToasties then
-                    IsThemeToasty = false
+                    ToastyManager.IsThemeToasty = false
                 end
             end
         }
-        t[#t + 1] = LoadActor(path .. Toasty .. "/default") .. {
-            Name = Toasty .. i,
+        t[#t + 1] = LoadActor(path .. ToastyManager.Toasty .. "/default") .. {
+            Name = ToastyManager.Toasty .. i,
             InitCommand = function(self)
                 ToastiesActors[#ToastiesActors + 1] = self
             end,
@@ -135,7 +135,7 @@ for i = 1, #Toasties do
                     {self, "PreTransition"})
             end,
             PreTransitionCommand = function(self)
-                if self:GetName() == LastToasty .. i then
+                if self:GetName() == ToastyManager.LastToasty .. i then
                     self:finishtweening()
                     self:visible(true)
                     for _, frame in pairs(self:GetChildren()) do
@@ -152,15 +152,15 @@ for i = 1, #Toasties do
     else
         t[#t + 1] = Def.ActorFrame {
             InitCommand = function(self)
-                Toasty = Toasties[i]
-                IsThemeToasty = true
+                ToastyManager.Toasty = Toasties[i]
+                ToastyManager.IsThemeToasty = true
                 if i > #DebugToasties then
-                    IsThemeToasty = false
+                    ToastyManager.IsThemeToasty = false
                 end
             end
         }
         t[#t + 1] = Def.ActorFrame {
-            Name = Toasty .. i,
+            Name = ToastyManager.Toasty .. i,
             InitCommand = function(self)
                 ToastiesActors[#ToastiesActors + 1] = self
             end,
@@ -171,7 +171,7 @@ for i = 1, #Toasties do
                     {self, "PreTransition"})
             end,
             PreTransitionCommand = function(self)
-                if self:GetName() == LastToasty .. i then
+                if self:GetName() == ToastyManager.LastToasty .. i then
                     self:finishtweening()
                     self:visible(true)
                     for _, frame in pairs(self:GetChildren()) do

@@ -43,6 +43,9 @@ PathManager.DebugAssetType = {
     Toasties = "Toasties"
 }
 
+PathManager.EmptyAudio = PathManager.DebugAssetPath .. "blank.ogg"
+PathManager.EmptyImage = PathManager.DebugAssetPath .. "blank.png"
+
 PathManager.DebugGraphic = PathManager.DebugAssetPath .. PathManager.DebugAssetType.Graphics .. "/"
 PathManager.DebugToasties = PathManager.DebugAssetPath .. PathManager.DebugAssetType.Toasties .. "/"
 
