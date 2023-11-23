@@ -123,7 +123,7 @@ for i = 1, #Toasties do
                 end
             end
         }
-        t[#t + 1] = LoadActor(path .. ToastyManager.Toasty .. "/default") .. {
+        t[#t + 1] = LoadActor(path .. ToastyManager.Toasty .. "/default.lua") .. {
             Name = ToastyManager.Toasty .. i,
             InitCommand = function(self)
                 ToastiesActors[#ToastiesActors + 1] = self
