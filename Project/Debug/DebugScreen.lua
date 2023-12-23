@@ -24,7 +24,8 @@ local Tests = {
     "Slider",
     "SliderRange",
     "MusicPlayer",
-    "ToastyViewer"
+    "ToastyViewer",
+    "MaskTest"
 }
 
 local SelectedTest = Var("SelectedTest") or nil
