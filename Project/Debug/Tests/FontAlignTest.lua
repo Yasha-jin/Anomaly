@@ -35,6 +35,13 @@ for Row, Text in ipairs(texts) do
             end
         }
     end
+    t[#t + 1] = Def.Quad {
+        BeginCommand = function(self)
+            self:zoomto(1920, 1)
+            self:addy(150 * Row)
+            self:addx(1920 / 2)
+        end
+    }
 end
 
 return t
