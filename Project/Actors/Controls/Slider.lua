@@ -1,6 +1,8 @@
 local Textures = Var("Textures") or {Marker = nil, BG = nil, Fill = nil}
 local Stretch = Var("Stretch") or false
 local Callback = Var("Callback") or nil -- assign a function to this
+local MessageOnMouseOver = Var("MessageOnMouseOver") or nil -- message broadcasted on mouseOver
+local MessageOnMouseOut = Var("MessageOnMouseOut") or nil -- same but mouseOut
 local MinRange = Var("MinRange") or 0
 local MaxRange = Var("MaxRange") or 10
 local InitRange = Var("InitRange") or MinRange
@@ -21,7 +23,7 @@ local MinX = 0
 local MaxX = 0
 local Index = InitRange
 
-UpdateSlider = function(event)
+local UpdateSlider = function(event)
     event = event or ""
     for i = 1, #UpdateOrder do
         if event == "Reset" or event == "Set" then
@@ -35,13 +37,13 @@ UpdateSlider = function(event)
     end
 end
 
-GetIndex = function(self, params)
+local GetIndex = function(self, params)
     local zoom = self:GetParent():GetZoomX()
     local v1 = (params.MouseX - self:GetParent():GetX()) - (MinX * zoom)
     local v2 = (MaxX * zoom) - (MinX * zoom)
     local percent = v1 / v2
-    local result = percent * MaxRange
-    return math.floor(result * 1 + 0.5) / 1
+    local result = percent * (MaxRange - MinRange)
+    return (math.floor(result * 1 + 0.5) / 1) + MinRange
 end
 
 return Def.ActorFrame {
@@ -61,6 +63,13 @@ return Def.ActorFrame {
         MinRange = params.min
         MaxRange = params.max
         UpdateSlider("Set")
+    end,
+    SendHoverCommand = function(self)
+        self:stoptweening()
+        MESSAGEMAN:Broadcast(MessageOnMouseOver)
+    end,
+    SendUnHoverCommand = function(self)
+        MESSAGEMAN:Broadcast(MessageOnMouseOut)
     end,
     UIElements.SpriteButton(1, 1, Textures.BG) .. {
         Name = "BG",
@@ -89,6 +98,16 @@ return Def.ActorFrame {
             if params.event ~= "DeviceButton_left mouse button" then return end
             UpdateSlider("Release")
         end,
+        MouseOverCommand = function(self)
+            if not MessageOnMouseOver then return end
+            if isOver(self) then
+                self:GetParent("Slider"):playcommand("SendHover")
+            end
+        end,
+        MouseOutCommand = function(self)
+            if not MessageOnMouseOut then return end
+            self:GetParent("Slider"):playcommand("SendUnhover")
+        end
     },
     UIElements.SpriteButton(1, 1, Textures.Fill) .. {
         Name = "Fill",
@@ -106,7 +125,7 @@ return Def.ActorFrame {
             if Stretch then
                 self:zoomx((Actors.Marker:GetX() - self:GetX()) / RangeTex:GetImageWidth())
             else
-                self:cropright(1 - (Index / MaxRange))
+                self:cropright(1 - ((Index - MinRange) / (MaxRange - MinRange)))
             end
         end,
         MouseDownCommand = function(self, params)
@@ -126,6 +145,16 @@ return Def.ActorFrame {
             if params.event ~= "DeviceButton_left mouse button" then return end
             UpdateSlider("Release")
         end,
+        MouseOverCommand = function(self)
+            if not MessageOnMouseOver then return end
+            if isOver(self) then
+                self:GetParent("Slider"):playcommand("SendHover")
+            end
+        end,
+        MouseOutCommand = function(self)
+            if not MessageOnMouseOut then return end
+            self:GetParent("Slider"):playcommand("SendUnhover")
+        end
     },
     UIElements.SpriteButton(1, 1, Textures.Marker) .. {
         Name = "Marker",
@@ -138,7 +167,7 @@ return Def.ActorFrame {
             MinX = self:GetX()
         end,
         UpdateCommand = function(self)
-            self:x(MinX + ((MaxX - MinX) / MaxRange * (Index - MinRange)))
+            self:x(MinX + ((MaxX - MinX) / (MaxRange - MinRange) * (Index - MinRange)))
         end,
         MouseDownCommand = function(self, params)
             if params.event ~= "DeviceButton_left mouse button" then return end
@@ -157,5 +186,15 @@ return Def.ActorFrame {
             if params.event ~= "DeviceButton_left mouse button" then return end
             UpdateSlider("Release")
         end,
+        MouseOverCommand = function(self)
+            if not MessageOnMouseOver then return end
+            if isOver(self) then
+                self:GetParent("Slider"):playcommand("SendHover")
+            end
+        end,
+        MouseOutCommand = function(self)
+            if not MessageOnMouseOut then return end
+            self:GetParent("Slider"):playcommand("SendUnhover")
+        end
     }
 }

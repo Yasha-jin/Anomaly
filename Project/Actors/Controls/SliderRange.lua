@@ -1,3 +1,4 @@
+-- Constants
 local Textures = Var("Textures") or {Marker = nil, BG = nil, Fill = nil}
 local Stretch = Var("Stretch") or false
 local Callback = Var("Callback") or nil -- assign a function to this
@@ -7,7 +8,9 @@ local InitMinRange = Var("InitMinRange") or MinRange
 local InitMaxRange = Var("InitMaxRange") or MaxRange
 local MarkerOffset = Var("MarkerOffset") or 0
 local ResetSpeed = Var("ResetSpeed") or 0.5
+local IgnoreInput = Var("IgnoreInput") or false
 
+-- Variables
 local Actors = {
     Slider = nil,
     LeftMarker = nil,
@@ -25,7 +28,7 @@ local LeftIndex = InitMinRange
 local RightIndex = InitMaxRange
 local GrabedMarker = nil
 
-UpdateSlider = function(event)
+local UpdateSlider = function(event)
     event = event or ""
     for i = 1, #UpdateOrder do
         if event == "Reset" or event == "Set" then
@@ -39,13 +42,13 @@ UpdateSlider = function(event)
     end
 end
 
-GetIndex = function(self, params)
+local GetIndex = function(self, params)
     local zoom = self:GetParent():GetZoomX()
     local v1 = (params.MouseX - self:GetParent():GetX()) - (MinX * zoom)
     local v2 = (MaxX * zoom) - (MinX * zoom)
     local percent = v1 / v2
-    local result = percent * MaxRange
-    return math.floor(result * 1 + 0.5) / 1
+    local result = percent * (MaxRange - MinRange)
+    return (math.floor(result * 1 + 0.5) / 1) + MinRange
 end
 
 return Def.ActorFrame {
@@ -63,11 +66,6 @@ return Def.ActorFrame {
         RightIndex = params.right
         UpdateSlider("Set")
     end,
-    SetRangeCommand = function(self, params)
-        MinRange = params.min
-        MaxRange = params.max
-        UpdateSlider("Set")
-    end,
     UIElements.SpriteButton(1, 1, Textures.BG) .. {
         Name = "BG",
         InitCommand = function(self)
@@ -76,10 +74,10 @@ return Def.ActorFrame {
             BGTex = self:GetTexture()
         end,
         BeginCommand = function(self)
-            UpdateSlider("Init")
+            UpdateSlider()
         end,
         MouseDownCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             if RightIndex - GetIndex(self, params) < GetIndex(self, params) - LeftIndex then
                 GrabedMarker = Actors.RightMarker
             else
@@ -88,7 +86,7 @@ return Def.ActorFrame {
             UpdateSlider("Press")
         end,
         MouseHoldCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             if GrabedMarker == Actors.RightMarker then
                 RightIndex = clamp(GetIndex(self, params), LeftIndex + 1, MaxRange)
             else
@@ -97,12 +95,12 @@ return Def.ActorFrame {
             UpdateSlider("Drag")
         end,
         MouseClickCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             GrabedMarker = nil
             UpdateSlider("Release")
         end,
         MouseReleaseCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             GrabedMarker = nil
             UpdateSlider("Release")
         end,
@@ -119,12 +117,12 @@ return Def.ActorFrame {
                 self:x(Actors.LeftMarker:GetX() + ((Actors.RightMarker:GetX() - Actors.LeftMarker:GetX()) / 2))
                 self:zoomx((Actors.RightMarker:GetX() - Actors.LeftMarker:GetX()) / RangeTex:GetImageWidth())
             else
-                self:cropleft(LeftIndex / MaxRange)
-                self:cropright(1 - (RightIndex / MaxRange))
+                self:cropleft(((LeftIndex - MinRange) / (MaxRange - MinRange)))
+                self:cropright(1 - ((RightIndex - MinRange) / (MaxRange - MinRange)))
             end
         end,
         MouseDownCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             if RightIndex - GetIndex(self, params) < GetIndex(self, params) - LeftIndex then
                 GrabedMarker = Actors.RightMarker
             else
@@ -133,7 +131,7 @@ return Def.ActorFrame {
             UpdateSlider("Press")
         end,
         MouseHoldCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             if GrabedMarker == Actors.RightMarker then
                 RightIndex = clamp(GetIndex(self, params), LeftIndex + 1, MaxRange)
             else
@@ -142,12 +140,12 @@ return Def.ActorFrame {
             UpdateSlider("Drag")
         end,
         MouseClickCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             GrabedMarker = nil
             UpdateSlider("Release")
         end,
         MouseReleaseCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             GrabedMarker = nil
             UpdateSlider("Release")
         end,
@@ -162,23 +160,24 @@ return Def.ActorFrame {
             MinX = self:GetX()
         end,
         UpdateCommand = function(self)
-            self:x(MinX + ((MaxX - MinX) / MaxRange * (LeftIndex - MinRange)))
+            -- self:x(MinX + ((MaxX - MinX) / MaxRange * (LeftIndex - MinRange)))
+            self:x(MinX + ((MaxX - MinX) / (MaxRange - MinRange) * (LeftIndex - MinRange)))
         end,
         MouseDownCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             UpdateSlider("Press")
         end,
         MouseHoldCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             LeftIndex = clamp(GetIndex(self, params), MinRange, RightIndex - 1)
             UpdateSlider("Drag")
         end,
         MouseClickCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             UpdateSlider("Release")
         end,
         MouseReleaseCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             UpdateSlider("Release")
         end,
     },
@@ -191,23 +190,23 @@ return Def.ActorFrame {
             MaxX = self:GetX()
         end,
         UpdateCommand = function(self)
-            self:x(MinX + ((MaxX - MinX) / MaxRange * RightIndex))
+            self:x(MinX + ((MaxX - MinX) / (MaxRange - MinRange) * (RightIndex - MinRange)))
         end,
         MouseDownCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             UpdateSlider("Press")
         end,
         MouseHoldCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             RightIndex = clamp(GetIndex(self, params), LeftIndex + 1, MaxRange)
             UpdateSlider("Drag")
         end,
         MouseClickCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             UpdateSlider("Release")
         end,
         MouseReleaseCommand = function(self, params)
-            if params.event ~= "DeviceButton_left mouse button" then return end
+            if params.event ~= "DeviceButton_left mouse button" or IgnoreInput then return end
             UpdateSlider("Release")
         end,
     },
